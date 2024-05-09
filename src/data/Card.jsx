@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 
 
 const Card = ({ cardNumber, color, onClick }) => {
-    let imagePath = '../../public/cards/back card/back_card.png'; // Chemin d'accès par défaut ou vide
+    let imagePath = '../assets/cards/back card/back_card.png'; // Chemin d'accès par défaut ou vide
     if (cardNumber !== undefined && color !== undefined) {
         if (color === 'red') {
-            imagePath = `../../public/cards/${cardNumber}-r.png`;
+            imagePath = `../assets/cards/${cardNumber}-r.png`;
         } else if (color === 'blue') {
-            imagePath = `../../public/cards/${cardNumber}-b.png`;
+            imagePath = `../assets/cards/${cardNumber}-b.png`;
         }
     }
 
