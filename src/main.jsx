@@ -9,7 +9,7 @@ import './index.css';
 const startGameAfterInsertCoin = async () => {
   try {
     // Activer le mode tour par tour et récupérer l'ID du défi
-    await insertCoin({ turnBased: true });
+    await insertCoin();
     ReactDOM.createRoot(document.getElementById('root')).render(
       <React.StrictMode>
         <App />

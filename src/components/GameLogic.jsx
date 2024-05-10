@@ -1,46 +1,25 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Card from '../data/Card';
-import Modal from './Modal';
+
 import DrinkModal from './DrinkModal';
 import { useMultiplayerState, insertCoin, myPlayer, usePlayersList } from 'playroomkit';
 import Avatar from '../Avatar/Avatar';
 import cardsData from '../data/cardsData';
 import './GameLogic.css';
 
-const ModaleNextPlayer = ({ onClose, onNextPlayer }) => {
-    return (
-        <div className="modal">
-            <div className="modal-content">
-                <h2>Passer au joueur suivant</h2>
-                <p>Voulez-vous passer au joueur suivant ?</p>
-                <button onClick={onNextPlayer}>Oui</button>
-                <button onClick={onClose}>Non</button>
-            </div>
-        </div>
-    );
-};
 
-ModaleNextPlayer.propTypes = {
-    onClose: PropTypes.func.isRequired,
-    onNextPlayer: PropTypes.func.isRequired,
-};
 
-const GameLogic = ({ onFinishGame }) => {
+const GameLogic = () => {
     const players = usePlayersList();
     const [round, setRound] = useMultiplayerState('round', 1);
     const [score, setScore] = useMultiplayerState('score', 10);
     const [previousCardValue, setPreviousCardValue] = useMultiplayerState('previousCardValue', 0);
     const [currentCard, setCurrentCard] = useMultiplayerState('currentCard', null);
     const [showBackCard, setShowBackCard] = useMultiplayerState('showBackCard', true);
-    const [showModal, setShowModal] = useMultiplayerState('showModal', false);
-    const [gameOver, setGameOver] = useMultiplayerState('gameOver', false);
     const [previousCards, setPreviousCards] = useMultiplayerState('previousCards', []);
     const [availableCards, setAvailableCards] = useState([]);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useMultiplayerState('currentPlayerIndex', 0);
-    const [answeredQuestions, setAnsweredQuestions] = useState(0);
-    const [showNextPlayerModal, setShowNextPlayerModal] = useState(false);
-    const [showReplayModal, setShowReplayModal] = useState(false);
 
     useEffect(() => {
         const setupMultiplayer = async () => {
@@ -50,106 +29,77 @@ const GameLogic = ({ onFinishGame }) => {
                 setAvailableCards(cardsData);
             }
         };
-
+    
         setupMultiplayer();
     }, []);
-
+    
     useEffect(() => {
         const remainingCards = cardsData.filter(card => !previousCards.includes(card));
         setAvailableCards(remainingCards);
-
+    
     }, [previousCards]);
 
-    const toggleNextPlayerModal = () => {
-        setShowNextPlayerModal(!showNextPlayerModal);
-    };
+const handleGuess = (guess) => {
+    if (players[currentPlayerIndex].id !== myPlayer().id) {
+        return;
+    }
 
-    const resetGame = () => {
-        setRound(1);
-        setPreviousCards([]);
-    };
+    const randomIndex = Math.floor(Math.random() * availableCards.length);
+    const card = availableCards[randomIndex];
 
-    const handleNextPlayer = () => {
-        resetGame();
+    setCurrentCard(card);
+    setShowBackCard(false);
+    setPreviousCards([...previousCards, card]);
 
-        const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
-        setCurrentPlayerIndex(nextPlayerIndex);
+    if (previousCards.length >= 4) {
+        setPreviousCards(previousCards.slice(1));
+    }
+    setPreviousCardValue(card.value);
 
-        setAnsweredQuestions(0);
-
-        const allPlayersAnswered = players.every((player, index) => {
-            return index === nextPlayerIndex || player.id === myPlayer().id;
-        });
-
-        if (allPlayersAnswered) {
-            toggleReplayModal();
+    let isCorrect = false;
+    if (round === 1) {
+        if ((card.value % 2 === 0 && guess === 'even') || (card.value % 2 !== 0 && guess === 'odd')) {
+            isCorrect = true;
         }
-    };
-
-    const toggleReplayModal = () => {
-        setShowReplayModal(!showReplayModal);
-    };
-
-    const handleGuess = (guess) => {
-        if (gameOver) return;
-        if (players[currentPlayerIndex].id !== myPlayer().id) {
-            return;
+    } else if (round === 2) {
+        if ((card.value > previousCardValue && guess === 'higher') || (card.value < previousCardValue && guess === 'lower')) {
+            isCorrect = true;
         }
-        const randomIndex = Math.floor(Math.random() * availableCards.length);
-        const card = availableCards[randomIndex];
-
-        setCurrentCard(card);
-        setShowBackCard(false);
-        setPreviousCards([...previousCards, card]);
-
-        if (previousCards.length >= 4) {
-            setPreviousCards(previousCards.slice(1));
+    } else if (round === 3) {
+        if ((card.value > previousCardValue && guess === 'inside') || (card.value < previousCardValue && guess === 'outside')) {
+            isCorrect = true;
         }
-        setPreviousCardValue(card.value);
-
-        let isCorrect = false;
-        if (round === 1) {
-            if ((card.value % 2 === 0 && guess === 'even') || (card.value % 2 !== 0 && guess === 'odd')) {
-                isCorrect = true;
-            }
-        } else if (round === 2) {
-            if ((card.value > previousCardValue && guess === 'higher') || (card.value < previousCardValue && guess === 'lower')) {
-                isCorrect = true;
-            }
-        } else if (round === 3) {
-            if ((card.value > previousCardValue && guess === 'inside') || (card.value < previousCardValue && guess === 'outside')) {
-                isCorrect = true;
-            }
-        } else if (round === 4) {
-            if ((card.color === 'red' && guess === 'red') || (card.color === 'blue' && guess === 'blue')) {
-                isCorrect = true;
-            }
+    } else if (round === 4) {
+        if ((card.color === 'red' && guess === 'red') || (card.color === 'blue' && guess === 'blue')) {
+            isCorrect = true;
         }
+    }
 
-        setScore(score + (isCorrect ? 1 : -1));
+    setScore(score + (isCorrect ? 1 : -1));
 
-        if (round === 4) {
-            onFinishGame(score);
-            setShowModal(true);
-            setGameOver(true);
-        } else {
-            setRound(round + 1);
-        }
+    if (round === 4) {
+        setRound(1); // Réinitialiser le tour à 1 pour continuer le jeu
+        setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length); // Passer au joueur suivant
+        
+        // Lancer le timer de 10 secondes avant de supprimer les cartes précédentes
+        setTimeout(() => {
+            setPreviousCards([]); // Effacer les cartes précédentes après 10 secondes
+        }, 5000);
+    } else {
+        setRound(round + 1);
+    }
 
-        setAnsweredQuestions(answeredQuestions + 1);
+    // Mettre à jour la dernière carte jouée avant de passer au joueur suivant
+    setCurrentCard(card);
+};
 
-        if (answeredQuestions >= 4) {
-            handleNextPlayer();
-        }
-    };
+    
+    
+    
+    
+    
 
-    const handleReplay = () => {
-        setRound(1);
-        setScore(0);
-        setShowModal(false);
-        setGameOver(false);
-        setPreviousCards([]);
-    };
+
 
     return (
         <div>
@@ -158,7 +108,9 @@ const GameLogic = ({ onFinishGame }) => {
             <div className="score-container">
                 <p>Score: {score}</p>
             </div>
+            
 
+            
             <div className="card-container">
                 {showBackCard ? (
                     <Card cardNumber={0} color="back" />
@@ -195,19 +147,8 @@ const GameLogic = ({ onFinishGame }) => {
                 )}
             </div>
             
-            {showModal && (
-                <Modal
-                    score={score}
-                    onReplay={handleReplay}
-                />
-            )}
 
-            {showNextPlayerModal && (
-                <ModaleNextPlayer
-                    onClose={toggleNextPlayerModal}
-                    onNextPlayer={handleNextPlayer}
-                />
-            )}
+
 
 
             <DrinkModal
