@@ -1,15 +1,21 @@
-
-import './style.css';
+import { useState } from 'react';
 import GameLogic from './components/GameLogic';
+import FinishButton from './components/FinishButton';
+import ScorePage from './components/ScorePage';
+import './style.css';
 
 function App() {
-  // Supprimer les déclarations de gameStarted et setGameStarted
+  const [isGameFinished, setIsGameFinished] = useState(false);
+
+  const finishGame = () => {
+    setIsGameFinished(true);
+  };
+
+  const handleReplay = () => {
+    setIsGameFinished(false);
+  };
 
   const BoardGame = () => {
-    const finishGame = (score) => {
-      console.log('Game finished with score:', score);
-    };
-
     return (
       <div className="board-game">
         <GameLogic onFinishGame={finishGame} />
@@ -20,7 +26,16 @@ function App() {
 
   return (
     <div className="app">
-      <BoardGame />
+      {!isGameFinished && (
+        <>
+          <BoardGame />
+          <FinishButton onFinishGame={finishGame} />
+        </>
+      )}
+
+      {isGameFinished && (
+        <ScorePage onReplay={handleReplay} />
+      )}
     </div>
   );
 }
