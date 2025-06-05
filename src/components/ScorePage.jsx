@@ -17,13 +17,19 @@ const ScorePage = () => {
         setPlayerProfiles(profiles);
     }, [players]);
 
+    const [, setRestartGame] = useMultiplayerState('restartGame', false);
+
     const handleReplay = () => {
         if (isHost) {
+
             localStorage.removeItem('drinksCountByPlayer');
             localStorage.removeItem('drinksCount');
             setDrinksCountByPlayer({});
             setDrinksCount(0);
             window.location.reload();
+
+            setRestartGame(prev => !prev);
+ main
         }
     };
 

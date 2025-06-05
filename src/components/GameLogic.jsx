@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Card from '../data/Card';
 import DrinkModal from './DrinkModal';
@@ -23,9 +23,27 @@ const GameLogic = ({ onFinishGame }) => {
     const [activePlayer, setActivePlayer] = useState('');
     const [drinksCount, setDrinksCount] = useMultiplayerState('drinksCount', 0);
     const [drinksCountByPlayer, setDrinksCountByPlayer] = useMultiplayerState('drinksCountByPlayer', {});
+    const [restartGame, setRestartGame] = useMultiplayerState('restartGame', false);
     const [, setIsModalOpen] = useState(false);
     const [drinkModal, setDrinkModal] = useState(null); // Ajout de l'état pour la modalité de boisson
     const [isGameFinished] = useMultiplayerState('isGameFinished', false); // Nouvelle variable partagée
+
+    const resetGameState = useCallback(() => {
+        setRound(1);
+        setPreviousCardValue(0);
+        setCurrentCard(null);
+        setShowBackCard(true);
+        setPreviousCards([]);
+        setCurrentPlayerIndex(0);
+        setDrinksCount(0);
+        setDrinksCountByPlayer({});
+        localStorage.removeItem('drinksCountByPlayer');
+        localStorage.removeItem('drinksCount');
+        if (myPlayer().isHost) {
+            setAvailableCards(cardsData);
+            setRestartGame(false);
+        }
+    }, [setRound, setPreviousCardValue, setCurrentCard, setShowBackCard, setPreviousCards, setCurrentPlayerIndex, setDrinksCount, setDrinksCountByPlayer, setAvailableCards, setRestartGame]);
 
     
     useEffect(() => {
@@ -49,7 +67,7 @@ const GameLogic = ({ onFinishGame }) => {
     useEffect(() => {
         const storedDrinksCountByPlayer = JSON.parse(localStorage.getItem('drinksCountByPlayer')) || {};
         setDrinksCountByPlayer(storedDrinksCountByPlayer);
-    }, []);
+    }, [setDrinksCountByPlayer]);
 
     useEffect(() => {
         const storedDrinksCount = parseInt(localStorage.getItem('drinksCount'));
@@ -58,7 +76,7 @@ const GameLogic = ({ onFinishGame }) => {
         } else {
             localStorage.setItem('drinksCount', '0');
         }
-    }, []);
+    }, [setDrinksCount]);
 
     useEffect(() => {
         const currentPlayer = players[currentPlayerIndex];
@@ -77,6 +95,12 @@ const GameLogic = ({ onFinishGame }) => {
 
         waitForEndGame();
     }, []);
+
+    useEffect(() => {
+        if (restartGame) {
+            resetGameState();
+        }
+    }, [restartGame, resetGameState]);
 
     const handleGuess = (guess) => {
         const currentPlayer = players[currentPlayerIndex];
@@ -97,11 +121,17 @@ const GameLogic = ({ onFinishGame }) => {
     
         setCurrentCard(card);
         setShowBackCard(false);
-        setPreviousCards([...previousCards, card]);
-    
-        if (previousCards.length >= 4) {
-            setPreviousCards(previousCards.slice(1));
-        }
+
+        // Update the list of previously drawn cards while
+        // keeping only the four most recent ones.
+        setPreviousCards(prevCards => {
+            const updatedCards = [...prevCards, card];
+            if (updatedCards.length > 4) {
+                updatedCards.shift();
+            }
+            return updatedCards;
+        });
+
         setPreviousCardValue(card.value);
     
         let isCorrect = false;
