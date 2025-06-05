@@ -1,0 +1,13 @@
+.score-page {
+    text-align: center;
+    padding: 2rem;
+}
+
+.score-page ul {
+    list-style: none;
+    padding: 0;
+}
+
+.score-page li {
+    margin: 0.5rem 0;
+}
