@@ -97,11 +97,17 @@ const GameLogic = ({ onFinishGame }) => {
     
         setCurrentCard(card);
         setShowBackCard(false);
-        setPreviousCards([...previousCards, card]);
-    
-        if (previousCards.length >= 4) {
-            setPreviousCards(previousCards.slice(1));
-        }
+
+        // Update the list of previously drawn cards while
+        // keeping only the four most recent ones.
+        setPreviousCards(prevCards => {
+            const updatedCards = [...prevCards, card];
+            if (updatedCards.length > 4) {
+                updatedCards.shift();
+            }
+            return updatedCards;
+        });
+
         setPreviousCardValue(card.value);
     
         let isCorrect = false;
