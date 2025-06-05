@@ -7,7 +7,6 @@ import Avatar from '../Avatar/Avatar';
 import cardsData from '../data/cardsData';
 
 import './GameLogic.css';
-import './FinishModal.css';
 
 
 const GameLogic = ({ onFinishGame }) => {
@@ -49,7 +48,7 @@ const GameLogic = ({ onFinishGame }) => {
     useEffect(() => {
         const storedDrinksCountByPlayer = JSON.parse(localStorage.getItem('drinksCountByPlayer')) || {};
         setDrinksCountByPlayer(storedDrinksCountByPlayer);
-    }, []);
+    }, [setDrinksCountByPlayer]);
 
     useEffect(() => {
         const storedDrinksCount = parseInt(localStorage.getItem('drinksCount'));
