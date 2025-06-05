@@ -266,11 +266,12 @@ const GameLogic = ({ onFinishGame }) => {
 
             <div className="previous-cards-container">
                 <h3>Previous Cards</h3>
-                {previousCards.map((card, index) => (
-                    <div key={index} className="previous-card">
-                        <Card cardNumber={parseInt(card.value)} color={card.color} />
-                    </div>
-                ))}
+                {Array.isArray(previousCards) &&
+                    previousCards.map((card, index) => (
+                        <div key={index} className="previous-card">
+                            <Card cardNumber={parseInt(card.value)} color={card.color} />
+                        </div>
+                    ))}
 
                 
             </div>
