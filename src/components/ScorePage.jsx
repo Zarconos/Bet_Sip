@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useMultiplayerState, usePlayersList, useIsHost } from 'playroomkit';
 
 const ScorePage = () => {
-    const [drinksCountByPlayer] = useMultiplayerState('drinksCountByPlayer', {});
-    const [drinksCount] = useMultiplayerState('drinksCount', 0);
+    const [drinksCountByPlayer, setDrinksCountByPlayer] = useMultiplayerState('drinksCountByPlayer', {});
+    const [drinksCount, setDrinksCount] = useMultiplayerState('drinksCount', 0);
     const players = usePlayersList();
     const [playerProfiles, setPlayerProfiles] = useState({});
     const isHost = useIsHost();
@@ -21,6 +21,8 @@ const ScorePage = () => {
         if (isHost) {
             localStorage.removeItem('drinksCountByPlayer');
             localStorage.removeItem('drinksCount');
+            setDrinksCountByPlayer({});
+            setDrinksCount(0);
             window.location.reload();
         }
     };
