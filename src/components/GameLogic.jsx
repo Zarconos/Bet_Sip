@@ -262,6 +262,7 @@ const GameLogic = ({ onFinishGame }) => {
                 <DrinkModal
                     numberOfDrinks={drinkModal.numberOfDrinks}
                     isWinner={drinkModal.isWinner}
+                    onClose={() => setDrinkModal(null)}
                 />
             )}
 
