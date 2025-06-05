@@ -49,7 +49,7 @@ const GameLogic = ({ onFinishGame }) => {
     useEffect(() => {
         const storedDrinksCountByPlayer = JSON.parse(localStorage.getItem('drinksCountByPlayer')) || {};
         setDrinksCountByPlayer(storedDrinksCountByPlayer);
-    }, []);
+    }, [setDrinksCountByPlayer]);
 
     useEffect(() => {
         const storedDrinksCount = parseInt(localStorage.getItem('drinksCount'));
