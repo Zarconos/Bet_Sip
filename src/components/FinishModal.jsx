@@ -1,4 +1,3 @@
-import './FinishModal.css';
 import PropTypes from 'prop-types';
 
 const FinishModal = ({ isOpen, onClose, drinksCountByPlayer, onReplay, isHost }) => {

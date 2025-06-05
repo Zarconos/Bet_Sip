@@ -7,7 +7,6 @@ import Avatar from '../Avatar/Avatar';
 import cardsData from '../data/cardsData';
 
 import './GameLogic.css';
-import './FinishModal.css';
 
 
 const GameLogic = ({ onFinishGame }) => {
