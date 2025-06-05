@@ -21,7 +21,7 @@ const GameLogic = ({ onFinishGame }) => {
     const [availableCards, setAvailableCards] = useState([]);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useMultiplayerState('currentPlayerIndex', 0);
     const [activePlayer, setActivePlayer] = useState('');
-    const [drinksCount, setDrinksCount] = useState(0);
+    const [drinksCount, setDrinksCount] = useMultiplayerState('drinksCount', 0);
     const [drinksCountByPlayer, setDrinksCountByPlayer] = useMultiplayerState('drinksCountByPlayer', {});
     const [restartGame, setRestartGame] = useMultiplayerState('restartGame', false);
     const [, setIsModalOpen] = useState(false);
@@ -162,6 +162,10 @@ const GameLogic = ({ onFinishGame }) => {
             };
             setDrinksCountByPlayer(newDrinksCountByPlayer);
             localStorage.setItem('drinksCountByPlayer', JSON.stringify(newDrinksCountByPlayer));
+
+            const totalDrinks = drinksCount + 1;
+            setDrinksCount(totalDrinks);
+            localStorage.setItem('drinksCount', totalDrinks.toString());
         }
 
     
