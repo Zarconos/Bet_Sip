@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useMultiplayerState } from 'playroomkit';
 import GameLogic from './components/GameLogic';
 import FinishButton from './components/FinishButton';
 import ScorePage from './components/ScorePage';
@@ -14,6 +15,14 @@ function App() {
   const handleReplay = () => {
     setIsGameFinished(false);
   };
+
+  const [restartGame] = useMultiplayerState('restartGame', false);
+
+  useEffect(() => {
+    if (restartGame) {
+      setIsGameFinished(false);
+    }
+  }, [restartGame]);
 
   const BoardGame = () => {
     return (
