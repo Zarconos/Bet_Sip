@@ -1,6 +1,17 @@
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-const DrinkModal = ({ numberOfDrinks, isWinner }) => {
+const DrinkModal = ({ numberOfDrinks, isWinner, onClose }) => {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (onClose) {
+                onClose();
+            }
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
     return (
         <div className="modal">
             <div className="modal-content">
@@ -14,6 +25,7 @@ const DrinkModal = ({ numberOfDrinks, isWinner }) => {
 DrinkModal.propTypes = {
     numberOfDrinks: PropTypes.number.isRequired,
     isWinner: PropTypes.bool.isRequired,
+    onClose: PropTypes.func,
 };
 
 export default DrinkModal;
