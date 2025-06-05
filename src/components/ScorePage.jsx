@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMultiplayerState, usePlayersList, useIsHost } from 'playroomkit';
+import './ScorePage.css';
 
 const ScorePage = () => {
     const [drinksCountByPlayer, setDrinksCountByPlayer] = useMultiplayerState('drinksCountByPlayer', {});
@@ -34,7 +35,7 @@ const ScorePage = () => {
     };
 
     return (
-        <div>
+        <div className="score-page">
             <h1>Page des scores</h1>
             <div>
                 <h2>Nombre total de boissons bues : {drinksCount}</h2>
